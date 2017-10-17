@@ -1,4 +1,4 @@
-source('load-mnist-data.R') # run this once, and then comment out to save processing time.
+#source('load-mnist-data.R') # run this once, and then comment out to save processing time.
 
 n.inputs <- 784 # The input images are 28x28, for a total of 784 pixels
 n.hidden <- 30 # Number of hidden layer nodes. You can adjust this parameter once you get the network working.
@@ -19,6 +19,13 @@ sigmoid.activation <- function(x){
 }
 
 # Add some code to visualize the sigmoid activation function from x=-10 to x=10.
+sigmoid <- numeric()
+i = -10
+while(i <= 10){
+  sigmoid[i] = (1 / (1+exp(-i)))
+  i = i+1
+}
+sigmoid
 
 # Initializing the matrices to hold the connection weights.
 # We'll create one matrix for the weights from the input to hidden layer, and another for the weights from the 
@@ -36,10 +43,25 @@ hidden.to.output.weights <- matrix(rnorm(n.hidden*n.output,mean=0,sd=0.1), nrow=
 # job is to create the hidden.layer and output.layer variables in the appropriate way.
 # Don't forget to use the sigmoid.activation function created above.
 forward.pass <- function(input, input.to.hidden.weights, hidden.to.output.weights){
-  hidden.layer.activation <- NA # replace NAs with correct code
-  output.layer.activation <- NA
+  #sum sigmoid - hidden layer activation
+  hidden.layer.activation <- vector(length=n.hidden)
+  for(j in i:n.hidden){
+    for(i in 1:n.inputs) {
+      hidden.layer.activation[j] <- (hidden.layer.activation[j] + (input.to.hidden.weights[i,j] * input[i]))
+    }
+    hidden.layer.activation[j] <- sigmoid.activation(hidden.layer.activation[j])
+  }
+  output.layer.activation <- vector(length=n.output)
+  for(j in 1:n.output){
+    for(i in 1:n.hidden){
+      output.layer.activation[j] <- (output.layer.activation[j] + (hidden.to.output.weights[i,j] + input[i]))
+    }
+    output.layer.activation[j] <- sigmoid.activation(output.layer.activation[j])
+  }
   return(list(hidden=hidden.layer.activation, output=output.layer.activation))
 }
+
+forward.pass(input, input.to.hidden.weights, hidden.to.output.weights)
 
 # Now we can write the backward pass, or the backprop function.
 # The input will be a vector that is n.inputs long
@@ -58,6 +80,7 @@ forward.pass <- function(input, input.to.hidden.weights, hidden.to.output.weight
 # terms for the hidden layer units. We know the error for the output, but need to back-propogate this error to the hidden layer.
 # I'll describe how this works below.
 
+#learning rate * weight * input
 backprop <- function(input, target, input.to.hidden.weights, hidden.to.output.weights){
   
   # Step 1. Because we are going to modify the weights in stages, we need to create
@@ -70,13 +93,13 @@ backprop <- function(input, target, input.to.hidden.weights, hidden.to.output.we
   
   # Step 2. Calculate the forward pass on the network. This gets us the activity of the
   # hidden and output layers for a particular set of inputs.
-  activations <- forward.pass(input)
+  activations <- forward.pass(input, input.to.hidden.weights, hidden.to.output.weights)
   output.activation <- activations$output
   hidden.activation <- activations$hidden
   
   # Step 3. Find the error on the output units. We can find the error just like we did 
   # with the delta rule. Just subtract the actual output from the desired output.
-  output.error <- NA # replace NA with correct code.
+  output.error <-  # replace NA with correct code.
   
   # Step 4. We need to multiply the error for a node (an element in the output.error vector)
   # by the derivative of the activation function for the node. The activation function is the
