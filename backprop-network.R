@@ -97,9 +97,9 @@ backprop <- function(input, target, input.to.hidden.weights, hidden.to.output.we
   output.activation <- activations$output
   hidden.activation <- activations$hidden
   
-  # Step 3. Find the error on the output units. We can find the error just like we did 
-  # with the delta rule. Just subtract the actual output from the desired output.
-  output.error <-  # replace NA with correct code.
+  # Step 3. Find the error on the output units.
+  
+  output.error <- target - output.activation
   
   # Step 4. We need to multiply the error for a node (an element in the output.error vector)
   # by the derivative of the activation function for the node. The activation function is the
@@ -107,8 +107,8 @@ backprop <- function(input, target, input.to.hidden.weights, hidden.to.output.we
   # Calculate a "weighted" error in two steps:
   # 1) Find the derivative (slope) for each output node at the level of activation of that node.
   # 2) Multiple this by the node's error to get the weighted error.
-  output.slope <- NA
-  output.weighted.error <- NA
+  output.slope <- deriv(output.error)
+  output.weighted.error <- output.slope * output.error
   
   # Step 5. Find the change in the hidden to output weights by applying the delta rule, using the
   # weighted error instead of the error.
